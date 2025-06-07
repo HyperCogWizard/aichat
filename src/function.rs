@@ -290,7 +290,7 @@ pub fn run_llm_function(
             scripts_dir.join("run-tool.sh").to_string_lossy().to_string(),
             cmd_name.clone(),
         ];
-        args.extend(cmd_args);
+        args.extend(cmd_args.clone());
         exit_code = run_command("bash", &args, Some(envs.clone()))
             .map_err(|err| anyhow!("Unable to run bash tool {cmd_name}, {err}"))?;
         executed = true;
@@ -305,7 +305,7 @@ pub fn run_llm_function(
             scripts_dir.join("run-tool.js").to_string_lossy().to_string(),
             cmd_name.clone(),
         ];
-        args.extend(cmd_args);
+        args.extend(cmd_args.clone());
         exit_code = run_command("node", &args, Some(envs.clone()))
             .map_err(|err| anyhow!("Unable to run JavaScript tool {cmd_name}, {err}"))?;
         executed = true;
@@ -320,7 +320,7 @@ pub fn run_llm_function(
             scripts_dir.join("run-tool.py").to_string_lossy().to_string(),
             cmd_name.clone(),
         ];
-        args.extend(cmd_args);
+        args.extend(cmd_args.clone());
         exit_code = run_command("python3", &args, Some(envs.clone()))
             .map_err(|err| anyhow!("Unable to run Python tool {cmd_name}, {err}"))?;
         executed = true;
