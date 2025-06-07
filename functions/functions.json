@@ -12,6 +12,18 @@
 }
 ,
 {
+  "name": "fetch_url_via_curl",
+  "description": "Fetch web page content via curl",
+  "parameters": {
+    "type": "object",
+    "required": ["url"],
+    "properties": {
+      "url": {"type": "string", "description": "The URL to fetch"}
+    }
+  }
+}
+,
+{
   "name": "fs_cat",
   "description": "Read file contents",
   "parameters": {
@@ -67,6 +79,18 @@
     "required": ["location"],
     "properties": {
       "location": {"type": "string", "description": "The location to get weather for."}
+    }
+  }
+}
+,
+{
+  "name": "search_wikipedia",
+  "description": "Search Wikipedia for information",
+  "parameters": {
+    "type": "object",
+    "required": ["query"],
+    "properties": {
+      "query": {"type": "string", "description": "The search query"}
     }
   }
 }

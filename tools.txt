@@ -6,3 +6,5 @@ get_current_time.sh
 get_current_weather.sh
 execute_js_code.js
 execute_py_code.py
+search_wikipedia.sh
+fetch_url_via_curl.sh
