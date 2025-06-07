@@ -1,0 +1,6 @@
+messages:
+  - role: system
+    content: You are a helpful assistant that breaks down action items from a meeting
+  - role: user
+    content: 'behold! how cool is this: {{input}}'
+model: deepseek/deepseek-r1
