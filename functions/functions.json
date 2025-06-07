@@ -1,0 +1,131 @@
+[
+{
+  "name": "execute_command",
+  "description": "Execute the shell command.",
+  "parameters": {
+    "type": "object",
+    "required": ["command"],
+    "properties": {
+      "command": {"type": "string", "description": "The command to execute."}
+    }
+  }
+}
+,
+{
+  "name": "fetch_url_via_curl",
+  "description": "Fetch web page content via curl",
+  "parameters": {
+    "type": "object",
+    "required": ["url"],
+    "properties": {
+      "url": {"type": "string", "description": "The URL to fetch"}
+    }
+  }
+}
+,
+{
+  "name": "fs_cat",
+  "description": "Read file contents",
+  "parameters": {
+    "type": "object",
+    "required": ["path"],
+    "properties": {
+      "path": {"type": "string", "description": "The file path to read"}
+    }
+  }
+}
+,
+{
+  "name": "fs_ls",
+  "description": "List files and directories",
+  "parameters": {
+    "type": "object",
+    
+    "properties": {
+      "path": {"type": "string", "description": "The path to list", "default": "."}
+    }
+  }
+}
+,
+{
+  "name": "fs_write",
+  "description": "Write text to a file",
+  "parameters": {
+    "type": "object",
+    "required": ["path","content"],
+    "properties": {
+      "path": {"type": "string", "description": "The file path to write to"},"content": {"type": "string", "description": "The content to write"}
+    }
+  }
+}
+,
+{
+  "name": "get_current_time",
+  "description": "Get current time",
+  "parameters": {
+    "type": "object",
+    
+    "properties": {
+      "format": {"type": "string", "description": "%H:%M:%S Format", "default": "%Y-%m-%d"}
+    }
+  }
+}
+,
+{
+  "name": "get_current_weather",
+  "description": "Get current weather information for a location.",
+  "parameters": {
+    "type": "object",
+    "required": ["location"],
+    "properties": {
+      "location": {"type": "string", "description": "The location to get weather for."}
+    }
+  }
+}
+,
+{
+  "name": "search_wikipedia",
+  "description": "Search Wikipedia for information",
+  "parameters": {
+    "type": "object",
+    "required": ["query"],
+    "properties": {
+      "query": {"type": "string", "description": "The search query"}
+    }
+  }
+}
+,
+{
+  "name": "execute_js_code",
+  "description": "Execute the javascript code in node.js",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string",
+        "description": "Javascript code to execute, such as `console.log(\"hello world\")`"
+      }
+    },
+    "required": [
+      "code"
+    ]
+  }
+}
+,
+{
+  "name": "execute_py_code",
+  "description": "Execute the python code.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string",
+        "description": "Python code to execute, such as `print(\"hello world\")`"
+      }
+    },
+    "required": [
+      "code"
+    ]
+  }
+}
+]

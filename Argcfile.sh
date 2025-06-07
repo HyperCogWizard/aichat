@@ -55,6 +55,84 @@ test-function-calling() {
     cargo run -- "${args[@]}" "$text"
 }
 
+# @cmd Build function declarations from tools
+# @option --output=functions.json Output file for function declarations
+# @arg tools+[`_choice_tool`] Tool files to build declarations for
+build-functions() {
+    mkdir -p functions
+    declarations=()
+    
+    for tool in "${argc_tools[@]}"; do
+        tool_path="tools/$tool"
+        if [[ ! -f "$tool_path" ]]; then
+            echo "Tool not found: $tool_path" >&2
+            continue
+        fi
+        
+        case "$tool" in
+            *.sh)
+                declaration=$(bash scripts/build-declarations.sh "$tool_path")
+                ;;
+            *.js)
+                declaration=$(node scripts/build-declarations.js "$tool_path")
+                ;;
+            *.py)
+                declaration=$(python3 scripts/build-declarations.py "$tool_path")
+                ;;
+            *)
+                echo "Unsupported tool type: $tool" >&2
+                continue
+                ;;
+        esac
+        
+        if [[ -n "$declaration" ]]; then
+            declarations+=("$declaration")
+            echo "Built declaration for $tool"
+        fi
+    done
+    
+    # Combine all declarations into a JSON array
+    if [[ ${#declarations[@]} -gt 0 ]]; then
+        printf '%s\n' "${declarations[@]}" | jq -s '.' > "$argc_output"
+        echo "Wrote ${#declarations[@]} function declarations to $argc_output"
+    else
+        echo "No valid declarations generated" >&2
+        exit 1
+    fi
+}
+
+# @cmd List available tools
+list-tools() {
+    find tools -name "*.sh" -o -name "*.js" -o -name "*.py" | sed 's|^tools/||' | sort
+}
+
+# @cmd Test a tool
+# @arg tool![`_choice_tool`] Tool to test
+# @arg json_args JSON arguments for the tool
+test-tool() {
+    tool_path="tools/$argc_tool"
+    if [[ ! -f "$tool_path" ]]; then
+        echo "Tool not found: $tool_path" >&2
+        exit 1
+    fi
+    
+    case "$argc_tool" in
+        *.sh)
+            bash scripts/run-tool.sh "${argc_tool%.sh}" "$argc_json_args"
+            ;;
+        *.js)
+            node scripts/run-tool.js "${argc_tool%.js}" "$argc_json_args"
+            ;;
+        *.py)
+            python3 scripts/run-tool.py "${argc_tool%.py}" "$argc_json_args"
+            ;;
+        *)
+            echo "Unsupported tool type: $argc_tool" >&2
+            exit 1
+            ;;
+    esac
+}
+
 # @cmd Test clients
 # @arg clients+[`_choice_client`]
 test-clients() {
@@ -360,6 +438,10 @@ _retrieve_api_base() {
 
 _choice_model() {
     aichat --list-models
+}
+
+_choice_tool() {
+    find tools -name "*.sh" -o -name "*.js" -o -name "*.py" | sed 's|^tools/||' | sort
 }
 
 _choice_provider_model() {

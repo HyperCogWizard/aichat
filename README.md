@@ -91,7 +91,21 @@ Integrate external documents into your LLM conversations for more accurate and c
 
 Function calling supercharges LLMs by connecting them to external tools and data sources. This unlocks a world of possibilities, enabling LLMs to go beyond their core capabilities and tackle a wider range of tasks.
 
-We have created a new repository [https://github.com/sigoden/llm-functions](https://github.com/sigoden/llm-functions) to help you make the most of this feature.
+**NEW**: AIChat now includes integrated llm-functions with 10+ built-in tools and a complete development framework. See [LLM_FUNCTIONS.md](LLM_FUNCTIONS.md) for details.
+
+#### Built-in Tools
+
+AIChat now comes with essential tools ready to use:
+
+- **File Operations**: Read, write, and list files (`fs_cat`, `fs_ls`, `fs_write`)
+- **Code Execution**: Run shell commands, JavaScript, and Python code
+- **Web Access**: Fetch URLs and search Wikipedia  
+- **Utilities**: Get current time and weather information
+
+```bash
+aichat --role %functions% "what files are in this directory?"
+aichat --role %functions% "what's the weather in Tokyo?"
+```
 
 #### AI Tools
 
@@ -102,6 +116,15 @@ Integrate external tools to automate tasks, retrieve information, and perform ac
 #### AI Agents (CLI version of OpenAI GPTs)
 
 AI Agent = Instructions (Prompt) + Tools (Function Callings) + Documents (RAG).
+
+Built-in agents:
+- **Coder**: Programming assistant with code execution capabilities
+- **Todo**: Task management with file-based todo lists
+
+```bash
+aichat --agent coder "help me debug this Python script"
+aichat --agent todo "add a new task to my list"
+```
 
 ![aichat-agent](https://github.com/user-attachments/assets/0b7e687d-e642-4e8a-b1c1-d2d9b2da2b6b)
 

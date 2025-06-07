@@ -260,6 +260,11 @@ pub fn run_llm_function(
         }
     }
     bin_dirs.push(Config::functions_bin_dir());
+    
+    // Also check for tools in the main directory
+    let tools_dir = Config::functions_dir().parent().unwrap_or_else(|| Path::new(".")).join("tools");
+    let scripts_dir = Config::functions_dir().parent().unwrap_or_else(|| Path::new(".")).join("scripts");
+    
     let current_path = std::env::var("PATH").context("No PATH environment variable")?;
     let prepend_path = bin_dirs
         .iter()
@@ -271,13 +276,67 @@ pub fn run_llm_function(
     let temp_file = temp_file("-eval-", "");
     envs.insert("LLM_OUTPUT".into(), temp_file.display().to_string());
 
-    #[cfg(windows)]
-    let cmd_name = polyfill_cmd_name(&cmd_name, &bin_dirs);
-    if *IS_STDOUT_TERMINAL {
-        println!("{}", dimmed_text(&prompt));
+    // Try to find the tool in different formats and execute accordingly
+    let mut executed = false;
+    let mut exit_code = 1;
+    
+    // Try bash script first
+    let bash_tool = tools_dir.join(format!("{}.sh", cmd_name));
+    if bash_tool.exists() && scripts_dir.join("run-tool.sh").exists() {
+        if *IS_STDOUT_TERMINAL {
+            println!("{}", dimmed_text(&prompt));
+        }
+        let mut args = vec![
+            scripts_dir.join("run-tool.sh").to_string_lossy().to_string(),
+            cmd_name.clone(),
+        ];
+        args.extend(cmd_args.clone());
+        exit_code = run_command("bash", &args, Some(envs.clone()))
+            .map_err(|err| anyhow!("Unable to run bash tool {cmd_name}, {err}"))?;
+        executed = true;
     }
-    let exit_code = run_command(&cmd_name, &cmd_args, Some(envs))
-        .map_err(|err| anyhow!("Unable to run {cmd_name}, {err}"))?;
+    
+    // Try JavaScript tool
+    else if tools_dir.join(format!("{}.js", cmd_name)).exists() && scripts_dir.join("run-tool.js").exists() {
+        if *IS_STDOUT_TERMINAL {
+            println!("{}", dimmed_text(&prompt));
+        }
+        let mut args = vec![
+            scripts_dir.join("run-tool.js").to_string_lossy().to_string(),
+            cmd_name.clone(),
+        ];
+        args.extend(cmd_args.clone());
+        exit_code = run_command("node", &args, Some(envs.clone()))
+            .map_err(|err| anyhow!("Unable to run JavaScript tool {cmd_name}, {err}"))?;
+        executed = true;
+    }
+    
+    // Try Python tool
+    else if tools_dir.join(format!("{}.py", cmd_name)).exists() && scripts_dir.join("run-tool.py").exists() {
+        if *IS_STDOUT_TERMINAL {
+            println!("{}", dimmed_text(&prompt));
+        }
+        let mut args = vec![
+            scripts_dir.join("run-tool.py").to_string_lossy().to_string(),
+            cmd_name.clone(),
+        ];
+        args.extend(cmd_args.clone());
+        exit_code = run_command("python3", &args, Some(envs.clone()))
+            .map_err(|err| anyhow!("Unable to run Python tool {cmd_name}, {err}"))?;
+        executed = true;
+    }
+    
+    // Fall back to the original bin-based execution
+    if !executed {
+        #[cfg(windows)]
+        let cmd_name = polyfill_cmd_name(&cmd_name, &bin_dirs);
+        if *IS_STDOUT_TERMINAL {
+            println!("{}", dimmed_text(&prompt));
+        }
+        exit_code = run_command(&cmd_name, &cmd_args, Some(envs))
+            .map_err(|err| anyhow!("Unable to run {cmd_name}, {err}"))?;
+    }
+    
     if exit_code != 0 {
         bail!("Tool call exit with {exit_code}");
     }
