@@ -44,3 +44,4 @@ jobs:
 
     - name: Format
       run: cargo fmt --all --check
+      
